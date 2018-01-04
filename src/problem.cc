@@ -24,8 +24,8 @@ inline int run_problem(int x, int y, func f) {
 ProblemManager::ProblemManager() {
   AddSolution(1, 1, []() {
     Buffer a(
-        "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f6973"
-        "6f6e6f7573206d757368726f6f6d",
+        "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f"
+        "6e6f7573206d757368726f6f6d",
         HEX);
     if (a.encode_base64() !=
         "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t") {
@@ -35,8 +35,8 @@ ProblemManager::ProblemManager() {
     Buffer b("SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t",
              BASE64);
     return b.encode_hex() ==
-           "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706"
-           "f69736f6e6f7573206d757368726f6f6d";
+           "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f697"
+           "36f6e6f7573206d757368726f6f6d";
   });
 
   AddSolution(1, 2, []() {
@@ -52,8 +52,8 @@ ProblemManager::ProblemManager() {
 
     for (int key = 0; key <= 255; key++) {
       Buffer buf(
-          "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b37"
-          "36",
+          "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b373"
+          "6",
           HEX);
       buf.xor_byte(static_cast<uint8_t>(key));
       std::string s = buf.encode();
@@ -97,10 +97,8 @@ ProblemManager::ProblemManager() {
         "cymbal");
     buf.xor_string("ICE");
     return buf.encode_hex() ==
-           "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a2622632"
-           "42"
-           "72765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165"
-           "28"
+           "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a262263242"
+           "72765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b2028316528"
            "6326302e27282f";
   });
 
