@@ -19,9 +19,13 @@ class ProblemManager {
   // Test everything, and return the number of failures.
   int TestAll();
 
+  // Test a given problem set.
+  int TestSet(int set);
+
+  // Test a given problem.
+  int TestProblem(int set, int problem);
+
  private:
   std::map<std::pair<int, int>, std::unique_ptr<Problem> > problems_;
-
-  Problem *FindProblem(const std::pair<int, int> &number);
 };
 }  // namespace cryptopals
