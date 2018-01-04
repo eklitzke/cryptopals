@@ -6,7 +6,7 @@
 
 namespace cryptopals {
 // convert a 3 byte string to a 4 byte base64
-inline void b64_helper(std::ostringstream &os, uint8_t *inp) {
+inline void bin_to_b64(std::ostringstream &os, uint8_t *inp) {
   static const char lut[] =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   const uint8_t b1 = inp[0] >> 2;
@@ -19,6 +19,8 @@ inline void b64_helper(std::ostringstream &os, uint8_t *inp) {
   assert(b4 < 64);
   os << lut[b1] << lut[b2] << lut[b3] << lut[b4];
 }
+
+inline void b64_to_bin(std::vector<uint8_t> &out, const char *data) {}
 
 // another helper
 inline uint8_t hex_to_bin(const char *str) {
@@ -50,6 +52,21 @@ Buffer::Buffer(const std::string &s, Encoding encoding) {
         buf_.push_back(hex_to_bin(s.data() + i * 2));
       }
       break;
+    case BASE64: {
+      assert(s.size() % 4 == 0);
+      size_t padding = 0;
+      for (auto it = s.rend(); it != s.rbegin(); it++) {
+        if (*it != '=') {
+          break;
+        }
+        padding++;
+      }
+      assert(padding <= 2);
+      for (size_t i = 0; i < s.size() / 4; i++) {
+        b64_to_bin(buf_, s.data() + i * 4);
+      }
+      break;
+    }
     default:
       assert(false);  // not reached
       break;
@@ -83,7 +100,7 @@ std::string Buffer::encode_base64() const {
 
   std::ostringstream os;
   for (size_t i = 0; i < sz; i += 3) {
-    b64_helper(os, bytes.get() + i);
+    bin_to_b64(os, bytes.get() + i);
   }
   std::string ret = os.str();
   assert(ret.size() % 4 == 0);

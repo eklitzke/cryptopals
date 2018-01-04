@@ -1,16 +1,12 @@
 #pragma once
 
+#include <functional>
 #include <map>
-#include <memory>
 #include <utility>
 
 namespace cryptopals {
-class ProblemManager;
 
-struct Problem {
-  // Run the test case, returns true on success and false on failure.
-  virtual bool test() = 0;
-};
+typedef std::function<bool(void)> func;
 
 class ProblemManager {
  public:
@@ -26,8 +22,8 @@ class ProblemManager {
   int TestProblem(int set, int problem);
 
  private:
-  std::map<std::pair<int, int>, std::unique_ptr<Problem> > problems_;
+  std::map<std::pair<int, int>, func> solutions_;
 
-  void AddSolution(int x, int y, std::unique_ptr<Problem> p);
+  void AddSolution(int x, int y, std::function<bool(void)> func);
 };
 }  // namespace cryptopals

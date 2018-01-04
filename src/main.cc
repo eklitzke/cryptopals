@@ -6,7 +6,6 @@
 #include <string>
 
 #include "./problem.h"
-#include "./solutions.h"
 
 inline int retval(int val) { return val == 0 ? 0 : 1; }
 
