@@ -96,5 +96,14 @@ struct Problem_1_5 : Problem {
   }
 };
 
+struct Problem_1_6 : Problem {
+ public:
+  virtual bool test() {
+    Buffer a("this is a test", false);
+    Buffer b("wokka wokka!!!", false);
+    return a.edit_distance(b) == 37;
+  }
+};
+
 void add_solutions(ProblemManager* manager);
 }  // namespace cryptopals

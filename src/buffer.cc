@@ -99,6 +99,16 @@ void Buffer::xor_string(const std::string &key) {
   }
 };
 
+size_t Buffer::edit_distance(const Buffer &other) {
+  assert(size() == other.size());
+  size_t distance = 0;
+  for (size_t i = 0; i < buf_.size(); i++) {
+    const uint8_t diff = buf_[i] ^ other.buf_[i];
+    distance += __builtin_popcount(diff);
+  }
+  return distance;
+}
+
 void Buffer::operator^=(const Buffer &other) {
   assert(size() == other.size());
   for (size_t i = 0; i < buf_.size(); i++) {

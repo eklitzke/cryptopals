@@ -24,6 +24,9 @@ class Buffer {
 
   void xor_string(const std::string &key);
 
+  // number of bits in the delta between the two
+  size_t edit_distance(const Buffer &other);
+
   inline size_t size() const { return buf_.size(); }
 
  private:
