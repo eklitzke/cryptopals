@@ -8,7 +8,7 @@ void decode_hex(const std::string &hexstring, uint8_t *buf, size_t sz);
 
 std::string encode_hex(const uint8_t *buf, size_t sz);
 
-std::string hex_to_base64(const std::string &hexstring);
+std::string to_base64(const uint8_t *buf, size_t sz);
 
 // a, b, and c should all be buffers of size sz. Then a and b are xored to
 // produce c.

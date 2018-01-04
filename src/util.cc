@@ -1,4 +1,4 @@
-#include "./base64.h"
+#include "./util.h"
 
 #include <cassert>
 #include <cstring>
@@ -53,16 +53,18 @@ std::string encode_hex(const uint8_t *buf, size_t sz) {
   return os.str();
 }
 
-std::string hex_to_base64(const std::string &hexstring) {
-  size_t sz = hexstring.size() / 2;
+std::string to_base64(const uint8_t *buf, size_t sz) {
+  // Kind of annoying, we need to pad the buffer if sz is not divisible by
+  // three.
   size_t padding = sz % 3;
   if (padding) {
     padding = 3 - padding;
   }
+
   sz += padding;
   std::unique_ptr<uint8_t[]> bytes(new uint8_t[sz]);
   std::memset(bytes.get(), 0, sz);
-  decode_hex(hexstring, bytes.get(), sz);
+  std::memmove(bytes.get(), buf, sz);
 
   std::ostringstream os;
   for (size_t i = 0; i < sz; i += 3) {

@@ -1,2 +1,2 @@
 bin_PROGRAMS = cryptopals
-cryptopals_SOURCES = base64.cc base64.h main.cc
+cryptopals_SOURCES = main.cc problem.cc problem.h solutions.cc solutions.h util.cc util.h
