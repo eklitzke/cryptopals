@@ -37,16 +37,22 @@ inline char bin_to_hex(uint8_t val) {
   return 'a' + val - 0xa;
 }
 
-Buffer::Buffer(const std::string &s, bool is_hex) {
-  if (is_hex) {
-    assert(s.size() % 2 == 0);
-    for (size_t i = 0; i < s.size() / 2; i++) {
-      buf_.push_back(hex_to_bin(s.data() + i * 2));
-    }
-  } else {
-    for (char c : s) {
-      buf_.push_back(static_cast<uint8_t>(c));
-    }
+Buffer::Buffer(const std::string &s, Encoding encoding) {
+  switch (encoding) {
+    case STRING:
+      for (char c : s) {
+        buf_.push_back(static_cast<uint8_t>(c));
+      }
+      break;
+    case HEX:
+      assert(s.size() % 2 == 0);
+      for (size_t i = 0; i < s.size() / 2; i++) {
+        buf_.push_back(hex_to_bin(s.data() + i * 2));
+      }
+      break;
+    default:
+      assert(false);  // not reached
+      break;
   }
 }
 

@@ -7,6 +7,7 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 namespace cryptopals {
@@ -16,7 +17,7 @@ struct Problem_1_1 : Problem {
     Buffer input(
         "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f6973"
         "6f6e6f7573206d757368726f6f6d",
-        true);
+        HEX);
     return input.encode_base64() ==
            "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
   }
@@ -25,8 +26,8 @@ struct Problem_1_1 : Problem {
 struct Problem_1_2 : Problem {
  public:
   virtual bool test() {
-    Buffer a("1c0111001f010100061a024b53535009181c");
-    Buffer b("686974207468652062756c6c277320657965");
+    Buffer a("1c0111001f010100061a024b53535009181c", HEX);
+    Buffer b("686974207468652062756c6c277320657965", HEX);
     a ^= b;
     return a.encode_hex() == "746865206b696420646f6e277420706c6179";
   }
@@ -41,7 +42,8 @@ struct Problem_1_3 : Problem {
     for (int key = 0; key <= 255; key++) {
       Buffer buf(
           "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b373"
-          "6");
+          "6",
+          HEX);
       buf.xor_byte(static_cast<uint8_t>(key));
       std::string s = buf.encode_raw();
       float score = score_string(s);
@@ -67,7 +69,7 @@ struct Problem_1_4 : Problem {
     while (std::getline(infile, line)) {
       assert(line.size() <= 60);
       for (int key = 0; key <= 255; key++) {
-        Buffer buf(line);
+        Buffer buf(line, HEX);
         buf.xor_byte(static_cast<uint8_t>(key));
         std::string s = buf.encode_raw();
         float score = score_string(s);
@@ -86,8 +88,7 @@ struct Problem_1_5 : Problem {
   virtual bool test() {
     Buffer buf(
         "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a "
-        "cymbal",
-        false);
+        "cymbal");
     buf.xor_string("ICE");
     return buf.encode_hex() ==
            "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a262263242"
@@ -99,11 +100,21 @@ struct Problem_1_5 : Problem {
 struct Problem_1_6 : Problem {
  public:
   virtual bool test() {
-    Buffer a("this is a test", false);
-    Buffer b("wokka wokka!!!", false);
-    return a.edit_distance(b) == 37;
+    Buffer a("this is a test");
+    Buffer b("wokka wokka!!!");
+    if (a.edit_distance(b) != 37) {
+      return false;
+    }
+
+    std::ifstream infile("data/6.txt");
+    std::string line;
+    std::ostringstream os;
+    while (std::getline(infile, line)) {
+      os << line;
+    };
+    std::string data = os.str();
+    std::cout << data << std::endl;
+    return false;
   }
 };
-
-void add_solutions(ProblemManager* manager);
 }  // namespace cryptopals

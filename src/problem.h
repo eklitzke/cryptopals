@@ -14,7 +14,7 @@ struct Problem {
 
 class ProblemManager {
  public:
-  void AddSolution(int x, int y, std::unique_ptr<Problem> p);
+  ProblemManager();
 
   // Test everything, and return the number of failures.
   int TestAll();
@@ -27,5 +27,7 @@ class ProblemManager {
 
  private:
   std::map<std::pair<int, int>, std::unique_ptr<Problem> > problems_;
+
+  void AddSolution(int x, int y, std::unique_ptr<Problem> p);
 };
 }  // namespace cryptopals

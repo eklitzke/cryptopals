@@ -7,10 +7,16 @@
 
 namespace cryptopals {
 
+enum Encoding {
+  STRING,
+  HEX,
+  BASE64,
+};
+
 class Buffer {
  public:
   Buffer() {}
-  explicit Buffer(const std::string &s, bool is_hex = true);
+  explicit Buffer(const std::string &s, Encoding encoding = STRING);
   Buffer(const Buffer &other) : buf_(other.buf_) {}
 
   std::string encode_raw() const;

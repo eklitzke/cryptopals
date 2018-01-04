@@ -33,7 +33,6 @@ int main(int argc, char **argv) {
     }
   }
   cryptopals::ProblemManager manager;
-  cryptopals::add_solutions(&manager);
   if (argc - optind == 1) {
     unsigned long int set = std::strtoul(argv[optind], nullptr, 10);
     return retval(manager.TestSet(set));

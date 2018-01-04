@@ -1,8 +1,12 @@
 #include "./problem.h"
+#include "./solutions.h"
 
 #include <cassert>
 #include <iostream>
 #include <utility>
+
+#define SOLUTION(x, y) \
+  AddSolution(x, y, std::unique_ptr<Problem>(new Problem_##x##_##y));
 
 namespace cryptopals {
 
@@ -14,6 +18,15 @@ inline int run_problem(int x, int y, Problem *p) {
   }
   std::cout << "FAIL" << std::endl;
   return 1;
+}
+
+ProblemManager::ProblemManager() {
+  SOLUTION(1, 1);
+  SOLUTION(1, 2);
+  SOLUTION(1, 3);
+  SOLUTION(1, 4);
+  SOLUTION(1, 5);
+  SOLUTION(1, 6);
 }
 
 void ProblemManager::AddSolution(int x, int y, std::unique_ptr<Problem> p) {
