@@ -8,5 +8,6 @@ void add_solutions(ProblemManager *manager) {
   SOLUTION(1, 1);
   SOLUTION(1, 2);
   SOLUTION(1, 3);
+  SOLUTION(1, 4);
 }
 }  // namespace cryptopals
