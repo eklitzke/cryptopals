@@ -145,12 +145,11 @@ int ProblemManager::TestSet(int set) {
 }
 
 int ProblemManager::TestProblem(int set, int problem) {
-  for (auto &kv : solutions_) {
-    if (kv.first.first == set && kv.first.second == problem) {
-      return run_problem(kv.first.first, kv.first.second, kv.second);
-    }
+  auto it = solutions_.find({set, problem});
+  if (it == solutions_.end()) {
+    std::cerr << "problem not found\n";
+    return 1;
   }
-  std::cerr << "problem not found\n";
-  return 1;
+  return run_problem(set, problem, it->second);
 }
 }  // namespace cryptopals
