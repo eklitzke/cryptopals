@@ -92,5 +92,22 @@ struct Problem_1_4 : Problem {
   }
 };
 
-void add_solutions(ProblemManager *manager);
+struct Problem_1_5 : Problem {
+ public:
+  DECLARE(1, 5)
+
+  virtual bool test() {
+    Buffer buf(
+        "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a "
+        "cymbal",
+        false);
+    buf.xor_string("ICE");
+    return buf.encode_hex() ==
+           "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a262263242"
+           "72765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b2028316528"
+           "6326302e27282f";
+  }
+};
+
+void add_solutions(ProblemManager* manager);
 }  // namespace cryptopals

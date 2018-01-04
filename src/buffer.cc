@@ -93,6 +93,12 @@ void Buffer::xor_byte(uint8_t k) {
   }
 }
 
+void Buffer::xor_string(const std::string &key) {
+  for (size_t i = 0; i < buf_.size(); i++) {
+    buf_[i] ^= static_cast<uint8_t>(key[i % key.size()]);
+  }
+};
+
 void Buffer::operator^=(const Buffer &other) {
   assert(size() == other.size());
   for (size_t i = 0; i < buf_.size(); i++) {
