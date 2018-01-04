@@ -27,6 +27,16 @@ int main(int argc, char **argv) {
       assert(hex_to_base64(inp) == outp);
       break;
     }
+    case 102: {
+      const std::string as = "1c0111001f010100061a024b53535009181c";
+      const std::string bs = "686974207468652062756c6c277320657965";
+      uint8_t a[18], b[18], c[18];
+      decode_hex(as, a, sizeof a);
+      decode_hex(bs, b, sizeof b);
+      xor_buffers(a, b, c, 18);
+      assert(encode_hex(c, sizeof c) == "746865206b696420646f6e277420706c6179");
+      break;
+    }
     default:
       std::cerr << "Unknown problem " << num << "\n";
       return 1;

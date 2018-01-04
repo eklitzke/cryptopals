@@ -28,8 +28,32 @@ inline uint8_t hex_to_bin(const char *str) {
   return result;
 }
 
-std::string hex_to_base64(const std::string &hexstring) {
+// encode a value in the range 0-f
+inline char bin_to_hex(uint8_t val) {
+  assert(val <= 0xf);
+  if (val < 0xa) {
+    return '0' + val;
+  }
+  return 'a' + val - 0xa;
+}
+
+void decode_hex(const std::string &hexstring, uint8_t *buf, size_t sz) {
   assert(hexstring.size() % 2 == 0);
+  assert(sz >= hexstring.size() / 2);
+  for (size_t i = 0; i < hexstring.size() / 2; i++) {
+    *(buf + i) = hex_to_bin(hexstring.data() + i * 2);
+  }
+}
+
+std::string encode_hex(const uint8_t *buf, size_t sz) {
+  std::ostringstream os;
+  for (size_t i = 0; i < sz; i++) {
+    os << bin_to_hex((buf[i] & 0xf0) >> 4) << bin_to_hex(buf[i] & 0xf);
+  }
+  return os.str();
+}
+
+std::string hex_to_base64(const std::string &hexstring) {
   size_t sz = hexstring.size() / 2;
   size_t padding = sz % 3;
   if (padding) {
@@ -38,9 +62,7 @@ std::string hex_to_base64(const std::string &hexstring) {
   sz += padding;
   std::unique_ptr<uint8_t[]> bytes(new uint8_t[sz]);
   std::memset(bytes.get(), 0, sz);
-  for (size_t i = 0; i < hexstring.size() / 2; i++) {
-    *(bytes.get() + i) = hex_to_bin(hexstring.data() + i * 2);
-  }
+  decode_hex(hexstring, bytes.get(), sz);
 
   std::ostringstream os;
   for (size_t i = 0; i < sz; i += 3) {
@@ -52,4 +74,10 @@ std::string hex_to_base64(const std::string &hexstring) {
     ret[ret.size() - 1 - i] = '=';
   }
   return ret;
+}
+
+void xor_buffers(uint8_t *a, uint8_t *b, uint8_t *c, size_t sz) {
+  for (size_t i = 0; i < sz; i++) {
+    c[i] = a[i] ^ b[i];
+  }
 }
