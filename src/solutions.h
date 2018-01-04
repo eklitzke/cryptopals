@@ -5,10 +5,13 @@
 
 #include <string>
 
+#define DECLARE(x, y) \
+  virtual std::pair<int, int> number() const { return {x, y}; }
+
 namespace cryptopals {
 struct Problem_1_1 : Problem {
  public:
-  virtual std::pair<int, int> number() { return {1, 1}; }
+  DECLARE(1, 1)
 
   virtual bool test() {
     const std::string inp =
@@ -23,7 +26,7 @@ struct Problem_1_1 : Problem {
 
 struct Problem_1_2 : Problem {
  public:
-  virtual std::pair<int, int> number() { return {1, 2}; }
+  DECLARE(1, 2)
 
   virtual bool test() {
     const std::string as = "1c0111001f010100061a024b53535009181c";

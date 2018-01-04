@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -8,7 +9,7 @@ class ProblemManager;
 
 struct Problem {
   // Return the case/problem number.
-  virtual std::pair<int, int> number() = 0;
+  virtual std::pair<int, int> number() const = 0;
 
   // Run the test case, returns true on success and false on failure.
   virtual bool test() = 0;
@@ -16,13 +17,13 @@ struct Problem {
 
 class ProblemManager {
  public:
-  void AddProblem(Problem *p);
+  void AddProblem(std::unique_ptr<Problem> p);
 
   // Test everything, and return the number of failures.
   int TestAll();
 
  private:
-  std::vector<Problem *> problems_;
+  std::vector<std::unique_ptr<Problem> > problems_;
 
   Problem *FindProblem(const std::pair<int, int> &number);
 };
