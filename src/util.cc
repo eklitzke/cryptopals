@@ -1,7 +1,6 @@
 #include "./util.h"
 
 #include <cassert>
-#include <cmath>
 #include <cstring>
 #include <unordered_map>
 
@@ -44,7 +43,8 @@ float score_string(const std::string &s) {
     float actual_frequency = (float)pr.second / (float)chars_total;
     const auto it = frequencies.find(pr.first);
     assert(it != frequencies.end());
-    delta += fabsf(actual_frequency - it->second);
+    float d = actual_frequency - it->second;
+    delta += d * d;
   }
 
   // penalize bad characters
@@ -57,6 +57,11 @@ float score_string(const std::string &s) {
     } else {
       delta += 10;
     }
+  }
+
+  // penalize if does not start with upper
+  if (!isupper(*s.begin())) {
+    delta += 1;
   }
 
   return delta;
