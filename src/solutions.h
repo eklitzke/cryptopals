@@ -9,14 +9,9 @@
 #include <iostream>
 #include <string>
 
-#define DECLARE(x, y) \
-  virtual std::pair<int, int> number() const { return {x, y}; }
-
 namespace cryptopals {
 struct Problem_1_1 : Problem {
  public:
-  DECLARE(1, 1)
-
   virtual bool test() {
     Buffer input(
         "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f6973"
@@ -29,8 +24,6 @@ struct Problem_1_1 : Problem {
 
 struct Problem_1_2 : Problem {
  public:
-  DECLARE(1, 2)
-
   virtual bool test() {
     Buffer a("1c0111001f010100061a024b53535009181c");
     Buffer b("686974207468652062756c6c277320657965");
@@ -41,8 +34,6 @@ struct Problem_1_2 : Problem {
 
 struct Problem_1_3 : Problem {
  public:
-  DECLARE(1, 3)
-
   virtual bool test() {
     std::string best_string;
     float best_score = 1000;
@@ -65,8 +56,6 @@ struct Problem_1_3 : Problem {
 
 struct Problem_1_4 : Problem {
  public:
-  DECLARE(1, 4)
-
   virtual bool test() {
     std::vector<std::string> inputs;
     std::ifstream infile("data/4.txt");
@@ -94,8 +83,6 @@ struct Problem_1_4 : Problem {
 
 struct Problem_1_5 : Problem {
  public:
-  DECLARE(1, 5)
-
   virtual bool test() {
     Buffer buf(
         "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a "
