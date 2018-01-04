@@ -2,13 +2,15 @@
 
 #include <cassert>
 #include <cstring>
+#include <iostream>
 #include <sstream>
 
 namespace cryptopals {
+static const std::string b64_lut =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
 // convert a 3 byte string to a 4 byte base64
 inline void bin_to_b64(std::ostringstream &os, uint8_t *inp) {
-  static const char lut[] =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
   const uint8_t b1 = inp[0] >> 2;
   assert(b1 < 64);
   const uint8_t b2 = ((inp[0] & 0x3) << 4) + (inp[1] >> 4);
@@ -17,10 +19,43 @@ inline void bin_to_b64(std::ostringstream &os, uint8_t *inp) {
   assert(b3 < 64);
   const uint8_t b4 = inp[2] & 0x3f;
   assert(b4 < 64);
-  os << lut[b1] << lut[b2] << lut[b3] << lut[b4];
+  os << b64_lut[b1] << b64_lut[b2] << b64_lut[b3] << b64_lut[b4];
 }
 
-inline void b64_to_bin(std::vector<uint8_t> &out, const char *data) {}
+inline uint8_t b64_char_to_num(char c) {
+  size_t pos = b64_lut.find(c);
+  if (pos == std::string::npos) {
+    return 0;
+  }
+  assert(pos < 64);
+  return static_cast<uint8_t>(pos);
+}
+
+inline void b64_to_bin(std::vector<uint8_t> &out, const char *data) {
+  size_t padding = 0;
+  for (int i = 0; i < 4; i++) {
+    if (data[i] == '=') {
+      padding++;
+    }
+  }
+  assert(padding <= 2);
+
+  uint8_t a = b64_char_to_num(data[0]);
+  uint8_t b = b64_char_to_num(data[1]);
+
+  out.push_back((a << 2) + ((b & 0x30) >> 4));
+  if (padding == 2) {
+    return;
+  }
+  uint8_t c = b64_char_to_num(data[2]);
+  out.push_back(((b & 0xf) << 4) + (c >> 2));
+
+  if (padding == 1) {
+    return;
+  }
+  uint8_t d = b64_char_to_num(data[3]);
+  out.push_back(((c & 0x3) << 6) + d);
+}
 
 // another helper
 inline uint8_t hex_to_bin(const char *str) {
@@ -73,14 +108,10 @@ Buffer::Buffer(const std::string &s, Encoding encoding) {
   }
 }
 
-std::string Buffer::encode_raw() const {
-  return {reinterpret_cast<const char *>(buf_.data()), buf_.size()};
-}
-
 std::string Buffer::encode_hex() const {
   std::ostringstream os;
-  for (uint8_t x : buf_) {
-    os << bin_to_hex((x & 0xf0) >> 4) << bin_to_hex(x & 0xf);
+  for (uint8_t c : buf_) {
+    os << bin_to_hex((c & 0xf0) >> 4) << bin_to_hex(c & 0xf);
   }
   return os.str();
 }

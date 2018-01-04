@@ -19,7 +19,9 @@ class Buffer {
   explicit Buffer(const std::string &s, Encoding encoding = STRING);
   Buffer(const Buffer &other) : buf_(other.buf_) {}
 
-  std::string encode_raw() const;
+  inline std::string encode() const {
+    return {reinterpret_cast<const char *>(buf_.data()), buf_.size()};
+  }
   std::string encode_hex() const;
   std::string encode_base64() const;
 
