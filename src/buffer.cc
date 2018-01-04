@@ -89,14 +89,6 @@ Buffer::Buffer(const std::string &s, Encoding encoding) {
       break;
     case BASE64: {
       assert(s.size() % 4 == 0);
-      size_t padding = 0;
-      for (auto it = s.rend(); it != s.rbegin(); it++) {
-        if (*it != '=') {
-          break;
-        }
-        padding++;
-      }
-      assert(padding <= 2);
       for (size_t i = 0; i < s.size() / 4; i++) {
         b64_to_bin(buf_, s.data() + i * 4);
       }

@@ -53,8 +53,7 @@ ProblemManager::ProblemManager() {
     for (int key = 0; key <= 255; key++) {
       Buffer buf(
           "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b37"
-          "3"
-          "6",
+          "36",
           HEX);
       buf.xor_byte(static_cast<uint8_t>(key));
       std::string s = buf.encode();
