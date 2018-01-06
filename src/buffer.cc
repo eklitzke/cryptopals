@@ -310,4 +310,22 @@ std::vector<Buffer> Buffer::stack_and_transpose(size_t width) const {
   }
   return transpose;
 }
+
+void Buffer::pad_pkcs7(uint8_t octets) {
+  assert(octets >= 1);
+  uint8_t padval = octets - (buf_.size() % octets);
+  for (uint8_t i = 0; i < padval; i++) {
+    buf_.push_back(padval);
+  }
+}
+
+void Buffer::unpad_pkcs7(uint8_t octets) {
+  assert(!buf_.empty());
+  uint8_t padval = *buf_.rbegin();
+  assert(padval && buf_.size() >= padval);
+  for (uint8_t i = 0; i < padval; i++) {
+    assert(*buf_.rbegin() == padval);
+    buf_.pop_back();
+  }
+}
 }  // namespace cryptopals

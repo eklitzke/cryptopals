@@ -70,6 +70,12 @@ class Buffer {
   std::string guess_vigenere_key(size_t min_key_size, size_t max_key_size,
                                  size_t guesses = 5) const;
 
+  // add padding bytes, as defined by pkcs #7
+  void pad_pkcs7(uint8_t octets);
+
+  // undo padding bytes, as defined by pkcs #7
+  void unpad_pkcs7(uint8_t octets);
+
  private:
   std::vector<uint8_t> buf_;
 

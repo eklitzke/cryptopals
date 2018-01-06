@@ -143,5 +143,26 @@ void add_all_solutions(ProblemManager *manager) {
            "d6aecd566489154789a6b0308649af70dc06f4fd5d2d69c744cd283d403180c98c8"
            "f6db1f2a3f9c4040deb0ab51b29933f2c123c58386b06fba186a";
   });
+
+  manager->AddSolution(2, 1, []() {
+    Buffer yellow("YELLOW SUBMARINE");
+    yellow.pad_pkcs7(20);
+    if (yellow.encode() != "YELLOW SUBMARINE\x04\x04\x04\x04") {
+      return false;
+    }
+    yellow.unpad_pkcs7(20);
+    if (yellow.encode() != "YELLOW SUBMARINE") {
+      return false;
+    }
+    yellow.pad_pkcs7(16);
+    if (yellow.encode() !=
+        "YELLOW "
+        "SUBMARINE\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10"
+        "\x10") {
+      return false;
+    }
+    yellow.unpad_pkcs7(16);
+    return yellow.encode() == "YELLOW SUBMARINE";
+  });
 }
 }  // namespace cryptopals
