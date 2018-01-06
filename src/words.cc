@@ -113,7 +113,7 @@ float score_text(const std::string &text, bool use_dict) {
 
     // convert to downcase
     if (isupper(c)) {
-      c = c - 'A' + 'a';
+      c = tolower(c);
     }
     char_counts[c]++;
     os << c;
