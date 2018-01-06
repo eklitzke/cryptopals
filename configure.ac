@@ -34,6 +34,10 @@ AS_COMPILER_FLAG([-std=c++17], [AX_APPEND_FLAG([-std=c++17])])
 AS_COMPILER_FLAG([-fdiagnostics-color=auto], [AX_APPEND_FLAG([-fdiagnostics-color=auto])])
 AS_COMPILER_FLAG([-Wall], [AX_APPEND_FLAG([-Wall])])
 
+PKG_CHECK_MODULES([openssl], [openssl >= 1])
+AC_SUBST(openssl_LIBS)
+AC_SUBST(openssl_CFLAGS)
+
 AC_CONFIG_FILES([Makefile
                  src/Makefile])
 AC_OUTPUT
