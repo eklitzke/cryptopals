@@ -16,31 +16,8 @@
 
 #pragma once
 
-#include <functional>
-#include <map>
-#include <utility>
+#include "./problem.h"
 
 namespace cryptopals {
-
-typedef std::function<bool(void)> func;
-
-class ProblemManager {
- public:
-  ProblemManager();
-
-  // Test everything, and return the number of failures.
-  int TestAll();
-
-  // Test a given problem set.
-  int TestSet(int set);
-
-  // Test a given problem.
-  int TestProblem(int set, int problem);
-
-  // Add a solution to the manager.
-  void AddSolution(int x, int y, std::function<bool(void)> func);
-
- private:
-  std::map<std::pair<int, int>, func> solutions_;
-};
+void add_all_solutions(ProblemManager *manager);
 }  // namespace cryptopals
