@@ -94,17 +94,15 @@ void add_all_solutions(ProblemManager *manager) {
     if (a.edit_distance(b) != 37) {
       return false;
     }
-
-    std::ifstream infile("data/6.txt");
-    std::string line;
-    std::ostringstream os;
-    while (std::getline(infile, line)) {
-      os << line;
-    };
-    Buffer buf(os.str(), BASE64);
-
+    Buffer buf("data/6.txt", BASE64_FILE);
     std::string key = buf.guess_vigenere_key(2, 40);
     return key == "Terminator X: Bring the noise";
+  });
+
+  manager->AddSolution(1, 7, []() {
+    const std::string key = "YELLOW SUBMARINE";
+    Buffer buf("data/7.txt", BASE64_FILE);
+    return false;
   });
 }
 }  // namespace cryptopals

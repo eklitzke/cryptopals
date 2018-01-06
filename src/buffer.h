@@ -28,6 +28,7 @@ enum Encoding {
   STRING,
   HEX,
   BASE64,
+  BASE64_FILE,
 };
 
 class Buffer {
@@ -77,16 +78,14 @@ class Buffer {
  private:
   std::vector<uint8_t> buf_;
 
+  // set the buffer contents based on base64 data
+  void set_base64_data(const std::string &s);
+
   // guess the key, and return it
   std::string guess_vigenere_key(size_t key_length, float *score) const;
 
   // try a single byte xor key, and return the score for the key
   float try_single_byte_xor_key(uint8_t key) const;
-#if 0
-  inline float try_single_byte_xor_key(int key) const {
-    return try_single_byte_xor_key(static_cast<uint8_t>(key));
-  }
-#endif
 
   std::vector<uint8_t> guess_single_byte_xor_keys(size_t count) const;
 };

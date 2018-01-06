@@ -20,6 +20,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <limits>
 #include <sstream>
@@ -118,16 +119,29 @@ Buffer::Buffer(const std::string &s, Encoding encoding) {
         buf_.push_back(hex_to_bin(s.data() + i * 2));
       }
       break;
-    case BASE64: {
-      assert(s.size() % 4 == 0);
-      for (size_t i = 0; i < s.size() / 4; i++) {
-        b64_to_bin(buf_, s.data() + i * 4);
-      }
+    case BASE64:
+      set_base64_data(s);
+      break;
+    case BASE64_FILE: {
+      std::ifstream infile(s);
+      std::string line;
+      std::ostringstream os;
+      while (std::getline(infile, line)) {
+        os << line;
+      };
+      set_base64_data(os.str());
       break;
     }
     default:
       assert(false);  // not reached
       break;
+  }
+}
+
+void Buffer::set_base64_data(const std::string &s) {
+  assert(s.size() % 4 == 0);
+  for (size_t i = 0; i < s.size() / 4; i++) {
+    b64_to_bin(buf_, s.data() + i * 4);
   }
 }
 
