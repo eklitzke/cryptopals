@@ -43,7 +43,7 @@ static float distance(const std::unordered_map<T, float> &ref_frequency,
   return dist;
 }
 
-float score_text(const std::string &text) {
+float score_text(const std::string &text, bool use_dict) {
   // copied from https://en.wikipedia.org/wiki/Letter_frequency
   static const std::unordered_map<char, float> char_frequencies{
       {'a', 8.167e-2},  {'b', 1.492e-2}, {'c', 2.782e-2}, {'d', 4.253e-2},
@@ -76,7 +76,7 @@ float score_text(const std::string &text) {
       {8, 0},  {9, 0},  {10, 0}, {11, 0}, {12, 0}, {13, 0}, {14, 0},
       {15, 0}, {16, 0}, {17, 0}, {18, 0}, {19, 0}, {20, 0}, {21, 0}};
 
-  if (words_.empty()) {
+  if (use_dict && words_.empty()) {
     std::ifstream infile("/usr/share/dict/words");
     std::string line;
     while (std::getline(infile, line)) {
@@ -85,7 +85,7 @@ float score_text(const std::string &text) {
   }
 
   float scale = 1;
-  size_t word_count = 0;
+  size_t dict_count = 0;
   std::ostringstream os;
   for (char c : text) {
     if (!isprint(c) && !isspace(c)) {
@@ -99,8 +99,8 @@ float score_text(const std::string &text) {
       if (s.size()) {
         std::size_t word_size = std::min(s.size(), length_overflow);
         word_counts[word_size]++;
-        if (words_.find(lowercase(s)) != words_.end()) {
-          word_count++;
+        if (use_dict && words_.find(lowercase(s)) != words_.end()) {
+          dict_count++;
         }
         std::ostringstream empty;
         os.swap(empty);
@@ -122,8 +122,8 @@ float score_text(const std::string &text) {
   const float char_dist = distance(char_frequencies, char_counts);
   const float word_dist = distance(word_lengths, word_counts);
   float rt = char_dist * word_dist * scale;
-  if (word_count) {
-    rt /= word_count;
+  if (use_dict && dict_count) {
+    rt /= dict_count;
   }
   return rt;
 }
