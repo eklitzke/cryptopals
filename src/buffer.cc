@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Evan Klitzke <evan@eklitzke.org>
+// Copyright (c) 2018 Evan Klitzke <evan@eklitzke.org>
 //
 // This file is part of cryptopals.
 //
