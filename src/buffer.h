@@ -72,9 +72,6 @@ class Buffer {
 
   inline size_t size() const { return buf_.size(); }
 
-  // vertically stack the buffers along some width
-  std::vector<Buffer> stack_and_transpose(size_t width) const;
-
  private:
   std::vector<uint8_t> buf_;
 
@@ -87,6 +84,7 @@ class Buffer {
   // try a single byte xor key, and return the score for the key
   float try_single_byte_xor_key(uint8_t key) const;
 
-  std::vector<uint8_t> guess_single_byte_xor_keys(size_t count) const;
+  // vertically stack the buffers along some width
+  std::vector<Buffer> stack_and_transpose(size_t width) const;
 };
 }  // namespace cryptopals

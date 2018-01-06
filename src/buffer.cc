@@ -199,23 +199,6 @@ float Buffer::try_single_byte_xor_key(uint8_t key) const {
   return clone.string_score();
 }
 
-std::vector<uint8_t> Buffer::guess_single_byte_xor_keys(size_t count) const {
-  std::vector<std::pair<uint8_t, float> > scores;
-  for (int key = 0; key <= 255; key++) {
-    scores.emplace_back(key, try_single_byte_xor_key(key));
-  }
-  std::sort(scores.begin(), scores.end(), [](const auto &lhs, const auto &rhs) {
-    return lhs.second < rhs.second;
-  });
-  count = std::min(count, scores.size());
-
-  std::vector<uint8_t> out;
-  for (size_t i = 0; i < count; i++) {
-    out.push_back(scores[i].first);
-  }
-  return out;
-}
-
 uint8_t Buffer::guess_single_byte_xor_key(std::string *out,
                                           float *score) const {
   uint8_t best_key = 0;
