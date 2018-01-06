@@ -26,8 +26,6 @@
 #include <sstream>
 #include <unordered_map>
 
-#include <openssl/evp.h>
-
 #include "./words.h"
 
 namespace cryptopals {
