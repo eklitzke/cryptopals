@@ -22,6 +22,7 @@
 #include <unordered_map>
 
 #include "./buffer.h"
+#include "./evp.h"
 #include "./solutions.h"
 
 namespace cryptopals {
@@ -103,7 +104,10 @@ void add_all_solutions(ProblemManager *manager) {
 
   manager->AddSolution(1, 7, []() {
     Buffer buf("data/7.txt", BASE64_FILE);
-    std::string plaintext = buf.decrypt_aes_128_ecb("YELLOW SUBMARINE");
+
+    CipherCtx c;
+    std::string plaintext =
+        c.decrypt_aes_128_ecb(buf.encode(), "YELLOW SUBMARINE");
     return plaintext.find("Play that funky music") != std::string::npos;
   });
 

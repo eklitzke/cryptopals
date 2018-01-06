@@ -70,8 +70,6 @@ class Buffer {
   std::string guess_vigenere_key(size_t min_key_size, size_t max_key_size,
                                  size_t guesses = 5) const;
 
-  std::string decrypt_aes_128_ecb(const std::string &key) const;
-
  private:
   std::vector<uint8_t> buf_;
 
