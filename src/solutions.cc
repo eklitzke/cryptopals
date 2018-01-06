@@ -17,6 +17,7 @@
 #include <cassert>
 #include <cmath>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 
 #include "./buffer.h"
@@ -100,9 +101,9 @@ void add_all_solutions(ProblemManager *manager) {
   });
 
   manager->AddSolution(1, 7, []() {
-    const std::string key = "YELLOW SUBMARINE";
     Buffer buf("data/7.txt", BASE64_FILE);
-    return false;
+    std::string plaintext = buf.decrypt_aes_128_ecb("YELLOW SUBMARINE");
+    return plaintext.find("Play that funky music") != std::string::npos;
   });
 }
 }  // namespace cryptopals

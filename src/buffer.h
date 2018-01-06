@@ -32,13 +32,13 @@ enum Encoding {
 };
 
 class Buffer {
- private:
-  Buffer(const std::vector<uint8_t> &buf) : buf_(buf) {}
-
  public:
   Buffer() {}
   explicit Buffer(const std::string &s, Encoding encoding = STRING);
+  explicit Buffer(const std::vector<uint8_t> &buf) : buf_(buf) {}
   Buffer(const Buffer &other) : buf_(other.buf_) {}
+
+  inline size_t size() const { return buf_.size(); }
 
   Buffer slice(size_t start, size_t end) const;
   Buffer copy() const;
@@ -70,7 +70,7 @@ class Buffer {
   std::string guess_vigenere_key(size_t min_key_size, size_t max_key_size,
                                  size_t guesses = 5) const;
 
-  inline size_t size() const { return buf_.size(); }
+  std::string decrypt_aes_128_ecb(const std::string &key) const;
 
  private:
   std::vector<uint8_t> buf_;

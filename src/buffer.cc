@@ -26,6 +26,9 @@
 #include <sstream>
 #include <unordered_map>
 
+#include <openssl/aes.h>
+#include <openssl/evp.h>
+
 #include "./words.h"
 
 namespace cryptopals {
@@ -314,5 +317,22 @@ std::vector<Buffer> Buffer::stack_and_transpose(size_t width) const {
     transpose.emplace_back(os.str(), STRING);
   }
   return transpose;
+}
+
+std::string Buffer::decrypt_aes_128_ecb(const std::string &key) const {
+  EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+  assert(ctx != nullptr);
+  assert(EVP_DecryptInit_ex(ctx, EVP_aes_128_ecb(), nullptr,
+                            (const unsigned char *)key.c_str(), nullptr) == 1);
+  // EVP_CIPHER_CTX_set_key_length(ctx, 8 * key.size());
+  auto plaintext = std::unique_ptr<uint8_t[]>(new uint8_t[size()]);
+  int len;
+  assert(EVP_DecryptUpdate(ctx, plaintext.get(), &len, buf_.data(),
+                           buf_.size()) == 1);
+  size_t plaintext_len = len;
+  assert(EVP_DecryptFinal_ex(ctx, plaintext.get() + len, &len) == 1);
+  plaintext_len += len;
+
+  return {(const char *)plaintext.get(), plaintext_len};
 }
 }  // namespace cryptopals
