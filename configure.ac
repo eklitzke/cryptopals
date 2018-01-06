@@ -28,13 +28,13 @@ AC_TYPE_SIZE_T
 AC_TYPE_UINT8_T
 
 # Checks for library functions.
-AC_CHECK_FUNCS([memmove memset])
+AC_CHECK_FUNCS([memmove memset strtoul])
 
 AS_COMPILER_FLAG([-std=c++17], [AX_APPEND_FLAG([-std=c++17])])
 AS_COMPILER_FLAG([-fdiagnostics-color=auto], [AX_APPEND_FLAG([-fdiagnostics-color=auto])])
 AS_COMPILER_FLAG([-Wall], [AX_APPEND_FLAG([-Wall])])
 
-PKG_CHECK_MODULES([openssl], [openssl >= 1])
+PKG_CHECK_MODULES([openssl], [openssl >= 1.1])
 AC_SUBST(openssl_LIBS)
 AC_SUBST(openssl_CFLAGS)
 
