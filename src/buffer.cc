@@ -1,11 +1,26 @@
 #include "./buffer.h"
 
+#include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <cstring>
 #include <iostream>
+#include <limits>
 #include <sstream>
+#include <unordered_map>
+
+#include "./words.h"
 
 namespace cryptopals {
+
+Buffer Buffer::slice(size_t start, size_t end) const {
+  end = std::min(end, buf_.size());
+  return Buffer(
+      std::vector<uint8_t>(buf_.cbegin() + start, buf_.cbegin() + end));
+}
+
+Buffer Buffer::copy() const { return Buffer(*this); }
+
 static const std::string b64_lut =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -133,6 +148,8 @@ std::string Buffer::encode_base64() const {
   return ret;
 }
 
+float Buffer::string_score() const { return score_text(encode()); }
+
 void Buffer::xor_byte(uint8_t k) {
   for (size_t i = 0; i < buf_.size(); i++) {
     buf_[i] ^= k;
@@ -140,10 +157,53 @@ void Buffer::xor_byte(uint8_t k) {
 }
 
 void Buffer::xor_string(const std::string &key) {
+  assert(key.size());
   for (size_t i = 0; i < buf_.size(); i++) {
     buf_[i] ^= static_cast<uint8_t>(key[i % key.size()]);
   }
 };
+
+float Buffer::try_single_byte_xor_key(uint8_t key) const {
+  Buffer clone = copy();
+  clone.xor_byte(key);
+  return clone.string_score();
+}
+
+std::vector<uint8_t> Buffer::guess_single_byte_xor_keys(size_t count) const {
+  std::vector<std::pair<uint8_t, float> > scores;
+  for (int key = 0; key <= 255; key++) {
+    scores.emplace_back(key, try_single_byte_xor_key(key));
+  }
+  std::sort(scores.begin(), scores.end(), [](const auto &lhs, const auto &rhs) {
+    return lhs.second < rhs.second;
+  });
+  count = std::min(count, scores.size());
+
+  std::vector<uint8_t> out;
+  for (size_t i = 0; i < count; i++) {
+    out.push_back(scores[i].first);
+  }
+  return out;
+}
+
+uint8_t Buffer::guess_single_byte_xor_key(std::string *out,
+                                          float *score) const {
+  uint8_t best_key = 0;
+  float best_score = std::numeric_limits<float>::max();
+  for (int key = 0; key <= 255; key++) {
+    uint8_t k = static_cast<uint8_t>(key);
+    auto clone = copy();
+    clone.xor_byte(k);
+    float val = clone.string_score();
+    if (val < best_score) {
+      best_score = val;
+      best_key = k;
+      if (out != nullptr) *out = clone.encode();
+      if (score != nullptr) *score = val;
+    }
+  }
+  return best_key;
+}
 
 size_t Buffer::edit_distance(const Buffer &other) {
   assert(size() == other.size());
@@ -160,5 +220,86 @@ void Buffer::operator^=(const Buffer &other) {
   for (size_t i = 0; i < buf_.size(); i++) {
     buf_[i] ^= other.buf_[i];
   }
+}
+
+std::string Buffer::guess_vigenere_key(size_t min_key_size, size_t max_key_size,
+                                       size_t guesses) const {
+  // First we need to guess the keysize. We look at the "entropy" from comparing
+  // the first few word sized guesses.
+  std::vector<std::pair<size_t, float> > key_size_entropies;
+  for (size_t width = min_key_size; width < max_key_size; width++) {
+    float dist = 0;
+    for (int j = 0; j < 4; j++) {
+      size_t off = width * j;
+      Buffer first = slice(off, off + width);
+      Buffer second = slice(off + width, off + 2 * width);
+      dist += first.edit_distance(second);
+    }
+    key_size_entropies.push_back({width, dist / (float)width});
+  }
+
+  // Sort from low to high, by normalized edit distance.
+  std::sort(
+      key_size_entropies.begin(), key_size_entropies.end(),
+      [](const auto &lhs, const auto &rhs) { return lhs.second < rhs.second; });
+
+  // Try the top guesses.
+  std::string best_string, best_key;
+  float best_score = std::numeric_limits<float>::max();
+  for (size_t i = 0; i < std::min(guesses, key_size_entropies.size()); i++) {
+    size_t key_size = key_size_entropies[i].first;
+    float score;
+    std::string key = guess_vigenere_key(key_size, &score);
+    if (score < best_score) {
+      best_score = score;
+      best_key = key;
+      Buffer clone = copy();
+      clone.xor_string(key);
+      best_string = clone.encode();
+#if 0
+      std::cout << "score: " << best_score << ", key_size: " << key_size
+                << ", key : " << key << ", string = " << best_string
+                << std::endl;
+#endif
+    }
+  }
+
+  return best_key;
+}
+
+std::string Buffer::guess_vigenere_key(size_t key_length, float *score) const {
+  std::ostringstream os;
+  for (const auto &buf : stack_and_transpose(key_length)) {
+    os << buf.guess_single_byte_xor_key();
+  }
+
+  const std::string key = os.str();
+  assert(key.size() == key_length);
+  if (score != nullptr) {
+    auto clone = copy();
+    clone.xor_string(key);
+    *score = clone.string_score();
+  }
+  return key;
+}
+
+std::vector<Buffer> Buffer::stack_and_transpose(size_t width) const {
+  // First stack them.
+  std::vector<Buffer> vstack;
+  for (size_t i = 0; i < buf_.size(); i += width) {
+    vstack.push_back(slice(i, i + width));
+  }
+
+  std::vector<Buffer> transpose;
+  for (size_t i = 0; i < width; i++) {
+    std::ostringstream os;
+    for (const auto &buf : vstack) {
+      if (i < buf.size()) {
+        os << buf[i];
+      }
+    }
+    transpose.emplace_back(os.str(), STRING);
+  }
+  return transpose;
 }
 }  // namespace cryptopals

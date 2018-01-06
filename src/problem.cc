@@ -3,11 +3,11 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <sstream>
 #include <utility>
 
 #include "./buffer.h"
-#include "./util.h"
 
 namespace cryptopals {
 
@@ -47,44 +47,29 @@ ProblemManager::ProblemManager() {
   });
 
   AddSolution(1, 3, []() {
+    Buffer buf(
+        "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736",
+        HEX);
     std::string best_string;
-    float best_score = 1000;
-
-    for (int key = 0; key <= 255; key++) {
-      Buffer buf(
-          "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b373"
-          "6",
-          HEX);
-      buf.xor_byte(static_cast<uint8_t>(key));
-      std::string s = buf.encode();
-      float score = score_string(s);
-      if (score < best_score) {
-        best_score = score;
-        best_string = s;
-      }
-    }
+    buf.guess_single_byte_xor_key(&best_string);
     return best_string == "Cooking MC's like a pound of bacon";
   });
 
   AddSolution(1, 4, []() {
-    std::vector<std::string> inputs;
+    std::string best_string;
+    float best_score = std::numeric_limits<float>::max();
+
     std::ifstream infile("data/4.txt");
     std::string line;
-
-    std::string best_string;
-    float best_score = 1000;
-
     while (std::getline(infile, line)) {
       assert(line.size() <= 60);
-      for (int key = 0; key <= 255; key++) {
-        Buffer buf(line, HEX);
-        buf.xor_byte(static_cast<uint8_t>(key));
-        std::string s = buf.encode();
-        float score = score_string(s);
-        if (score < best_score) {
-          best_score = score;
-          best_string = s;
-        }
+      Buffer buf(line, HEX);
+      std::string s;
+      float score;
+      buf.guess_single_byte_xor_key(&s, &score);
+      if (score < best_score) {
+        best_string = s;
+        best_score = score;
       }
     }
     return best_string == "Now that the party is jumping\n";
@@ -115,7 +100,9 @@ ProblemManager::ProblemManager() {
       os << line;
     };
     Buffer buf(os.str(), BASE64);
-    return false;
+
+    std::string key = buf.guess_vigenere_key(2, 40);
+    return key == "Terminator X: Bring the noise";
   });
 }
 
