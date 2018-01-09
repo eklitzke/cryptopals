@@ -24,8 +24,8 @@
 #include "./aes.hpp"
 
 namespace cryptopals {
-std::string CipherCtx::decrypt_aes_128_ecb(const std::string &ciphertext,
-                                           const std::string &key) {
+std::string aes_ecb_decrypt(const std::string &ciphertext,
+                            const std::string &key) {
   assert(ciphertext.size() % AES_BLOCKLEN == 0);
   AES_ctx ctx;
   AES_init_ctx(&ctx, (const uint8_t *)key.c_str());

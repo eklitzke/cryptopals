@@ -105,9 +105,7 @@ void add_all_solutions(ProblemManager *manager) {
   manager->AddSolution(1, 7, []() {
     Buffer buf("data/7.txt", BASE64_FILE);
 
-    CipherCtx c;
-    std::string plaintext =
-        c.decrypt_aes_128_ecb(buf.encode(), "YELLOW SUBMARINE");
+    std::string plaintext = aes_ecb_decrypt(buf.encode(), "YELLOW SUBMARINE");
     return plaintext.find("Play that funky music") != std::string::npos;
   });
 

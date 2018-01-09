@@ -19,9 +19,6 @@
 #include <string>
 
 namespace cryptopals {
-class CipherCtx {
- public:
-  std::string decrypt_aes_128_ecb(const std::string &ciphertext,
-                                  const std::string &key);
-};
+std::string aes_ecb_decrypt(const std::string &ciphertext,
+                            const std::string &key);
 }  // namespace cryptopals
