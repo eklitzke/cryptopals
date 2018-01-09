@@ -27,5 +27,5 @@ $ ./src/cryptopals 1 6
 ```
 
 This repository includes files from
-[kokke/tine-AES-c](https://github.com/kokke/tiny-AES-c). The rest of the code is
+[kokke/tiny-AES-c](https://github.com/kokke/tiny-AES-c). The rest of the code is
 licensed GPLv3+.
