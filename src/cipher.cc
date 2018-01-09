@@ -19,7 +19,6 @@
 #include <cassert>
 #include <cstring>
 #include <memory>
-#include <sstream>
 
 #include "./aes.hpp"
 
@@ -30,13 +29,10 @@ std::string aes_ecb_decrypt(const std::string &ciphertext,
   AES_ctx ctx;
   AES_init_ctx(&ctx, (const uint8_t *)key.c_str());
 
-  std::ostringstream os;
-  uint8_t buf[AES_BLOCKLEN];
-  for (size_t i = 0; i < ciphertext.size(); i += AES_BLOCKLEN) {
-    std::memmove(buf, ciphertext.data() + i, AES_BLOCKLEN);
-    AES_ECB_decrypt(&ctx, buf);
-    os.write((const char *)buf, AES_BLOCKLEN);
+  std::string copy = ciphertext;
+  for (size_t i = 0; i < copy.size(); i += AES_BLOCKLEN) {
+    AES_ECB_decrypt(&ctx, (uint8_t *)copy.data() + i);
   }
-  return os.str();
+  return copy;
 }
 }  // namespace cryptopals
