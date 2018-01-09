@@ -1,11 +1,11 @@
 These are my solutions to the puzzles on
 [cryptopals.com](http://cryptopals.com/), implemented in C++. This repository
-probably isn't useful to you, unless you want to compare solutions.
+probably isn't useful to you unless you want to compare cryptopals solutions.
 
 This is a standard autotools project. Compile it like this:
 
 ```bash
-# Compile the code.
+# Compile cryptopals.
 $ ./autogen.sh
 $ ./configure
 $ make
@@ -25,6 +25,6 @@ $ ./src/cryptopals 1
 $ ./src/cryptopals 1 6
 ```
 
-This repository includes files from the
-[kokke/tine-AES-c](https://github.com/kokke/tiny-AES-c) AES implementation. All
-other code is licensed GPLv3+.
+This repository includes files from
+[kokke/tine-AES-c](https://github.com/kokke/tiny-AES-c). The rest of the code is
+licensed GPLv3+.
