@@ -34,6 +34,10 @@ AS_COMPILER_FLAG([-std=c++17], [AX_APPEND_FLAG([-std=c++17])])
 AS_COMPILER_FLAG([-fdiagnostics-color=auto], [AX_APPEND_FLAG([-fdiagnostics-color=auto])])
 AS_COMPILER_FLAG([-Wall], [AX_APPEND_FLAG([-Wall])])
 
+# Disable CBC/CTR code from tiny-aes
+AX_APPEND_FLAG([-DCBC=0])
+AX_APPEND_FLAG([-DCTR=0])
+
 AC_CONFIG_FILES([Makefile
                  src/Makefile])
 AC_OUTPUT
