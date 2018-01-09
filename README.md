@@ -2,10 +2,11 @@ These are my solutions to the puzzles on
 [cryptopals.com](http://cryptopals.com/), implemented in C++. This repository
 probably isn't useful to you unless you want to compare cryptopals solutions.
 
-This is a standard autotools project. Compile it like this:
+This is a standard autotools project. There are no dependencies other than a
+reasonably modern C++ compiler. You can build the code like this:
 
 ```bash
-# Compile cryptopals.
+# Build cryptopals.
 $ ./autogen.sh
 $ ./configure
 $ make
