@@ -6,7 +6,7 @@ set -eu
 
 cd ./src
 SOURCES=()
-for f in $(git ls-files -- '*.cc' '*.h'); do
+for f in $(git ls-files -- '*.c' '*.cc' '*.h' '*.hpp'); do
   SOURCES+=("$f")
 done
 

@@ -14,24 +14,29 @@
 // You should have received a copy of the GNU General Public License along with
 // cryptopals. If not, see <http://www.gnu.org/licenses/>.
 
-#pragma once
+#include "./cipher.h"
 
 #include <cassert>
-#include <string>
+#include <cstring>
+#include <memory>
+#include <sstream>
 
-#include <openssl/evp.h>
+#include "./aes.hpp"
 
 namespace cryptopals {
-class CipherCtx {
- public:
-  CipherCtx() : ctx_(EVP_CIPHER_CTX_new()) { assert(ctx_ != nullptr); }
-  ~CipherCtx() { EVP_CIPHER_CTX_free(ctx_); }
+std::string CipherCtx::decrypt_aes_128_ecb(const std::string &ciphertext,
+                                           const std::string &key) {
+  assert(ciphertext.size() % AES_BLOCKLEN == 0);
+  AES_ctx ctx;
+  AES_init_ctx(&ctx, (const uint8_t *)key.c_str());
 
-  std::string decrypt_aes_128_ecb(const std::string &ciphertext,
-                                  const std::string &key);
-
- private:
-  EVP_CIPHER_CTX *ctx_;
-};
-
+  std::ostringstream os;
+  uint8_t buf[AES_BLOCKLEN];
+  for (size_t i = 0; i < ciphertext.size(); i += AES_BLOCKLEN) {
+    std::memmove(buf, ciphertext.data() + i, AES_BLOCKLEN);
+    AES_ECB_decrypt(&ctx, buf);
+    os.write((const char *)buf, AES_BLOCKLEN);
+  }
+  return os.str();
+}
 }  // namespace cryptopals

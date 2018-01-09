@@ -14,24 +14,14 @@
 // You should have received a copy of the GNU General Public License along with
 // cryptopals. If not, see <http://www.gnu.org/licenses/>.
 
-#include "./evp.h"
+#pragma once
 
-#include <memory>
+#include <string>
 
 namespace cryptopals {
-std::string CipherCtx::decrypt_aes_128_ecb(const std::string &ciphertext,
-                                           const std::string &key) {
-  assert(EVP_DecryptInit_ex(ctx_, EVP_aes_128_ecb(), nullptr,
-                            (const unsigned char *)key.c_str(), nullptr) == 1);
-  auto plaintext = std::unique_ptr<uint8_t[]>(new uint8_t[ciphertext.size()]);
-  int len;
-  assert(EVP_DecryptUpdate(ctx_, plaintext.get(), &len,
-                           (const unsigned char *)ciphertext.data(),
-                           ciphertext.size()) == 1);
-  size_t plaintext_len = len;
-  assert(EVP_DecryptFinal_ex(ctx_, plaintext.get() + len, &len) == 1);
-  plaintext_len += len;
-
-  return {(const char *)plaintext.get(), plaintext_len};
-}
+class CipherCtx {
+ public:
+  std::string decrypt_aes_128_ecb(const std::string &ciphertext,
+                                  const std::string &key);
+};
 }  // namespace cryptopals

@@ -22,7 +22,7 @@
 #include <unordered_map>
 
 #include "./buffer.h"
-#include "./evp.h"
+#include "./cipher.h"
 #include "./solutions.h"
 
 namespace cryptopals {

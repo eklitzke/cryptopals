@@ -1,4 +1,2 @@
 bin_PROGRAMS = cryptopals
-cryptopals_SOURCES = buffer.cc buffer.h evp.cc evp.h main.cc problem.cc problem.h solutions.cc solutions.h words.cc words.h
-cryptopals_CFLAGS = $(openssl_CFLAGS)
-cryptopals_LDADD = $(openssl_LIBS)
+cryptopals_SOURCES = aes.c aes.h aes.hpp buffer.cc buffer.h cipher.cc cipher.h main.cc problem.cc problem.h solutions.cc solutions.h words.cc words.h

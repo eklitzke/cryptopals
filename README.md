@@ -2,8 +2,7 @@ These are my solutions to the puzzles on
 [cryptopals.com](http://cryptopals.com/), implemented in C++. This repository
 probably isn't useful to you, unless you want to compare solutions.
 
-This is a standard autotools project. There is a linking dependency against
-OpenSSL. Compile it like this:
+This is a standard autotools project. Compile it like this:
 
 ```bash
 # Compile the code.
@@ -25,3 +24,6 @@ $ ./src/cryptopals 1
 # Run just the test for set 1 problem 6.
 $ ./src/cryptopals 1 6
 ```
+
+This repository includes files from the
+[kokke/tine-AES-c](https://github.com/kokke/tiny-AES-c) AES implementation.
