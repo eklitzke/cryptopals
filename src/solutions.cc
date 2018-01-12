@@ -22,7 +22,6 @@
 #include <unordered_map>
 
 #include "./buffer.h"
-#include "./cipher.h"
 #include "./solutions.h"
 
 namespace cryptopals {
@@ -104,9 +103,8 @@ void add_all_solutions(ProblemManager *manager) {
 
   manager->AddSolution(1, 7, []() {
     Buffer buf("data/7.txt", BASE64_FILE);
-
-    std::string plaintext = aes_ecb_decrypt(buf.encode(), "YELLOW SUBMARINE");
-    return plaintext.find("Play that funky music") != std::string::npos;
+    buf.aes_ecb_decrypt("YELLOW SUBMARINE");
+    return buf.encode().find("Play that funky music") != std::string::npos;
   });
 
   manager->AddSolution(1, 8, []() {

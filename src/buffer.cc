@@ -330,6 +330,17 @@ void Buffer::unpad_pkcs7() {
   }
 }
 
+void Buffer::aes_ecb_decrypt(const std::string &key, bool pkcs7) {
+  assert(buf_.size() % AES_BLOCKLEN == 0);
+
+  AES_ctx ctx;
+  AES_init_ctx(&ctx, (const uint8_t *)key.c_str());
+
+  for (size_t i = 0; i < buf_.size(); i += AES_BLOCKLEN) {
+    AES_ECB_decrypt(&ctx, buf_.data() + i);
+  }
+}
+
 static void xor_inplace(uint8_t *target, const uint8_t *iv) {
   for (size_t i = 0; i < AES_BLOCKLEN; i++) {
     *(target + i) ^= *(iv + i);

@@ -76,6 +76,9 @@ class Buffer {
   // undo padding bytes, as defined by pkcs #7
   void unpad_pkcs7();
 
+  // ecb decrypt *in place*
+  void aes_ecb_decrypt(const std::string &key, bool pkcs7 = true);
+
   // cbc decrypt *in place*
   void aes_cbc_decrypt(const std::string &key, bool pkcs7 = true);
 
