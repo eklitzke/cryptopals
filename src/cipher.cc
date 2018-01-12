@@ -19,13 +19,16 @@
 #include <cassert>
 #include <cstring>
 #include <memory>
+#include <sstream>
 
 #include "./aes.hpp"
+#include "./buffer.h"
 
 namespace cryptopals {
 std::string aes_ecb_decrypt(const std::string &ciphertext,
                             const std::string &key) {
   assert(ciphertext.size() % AES_BLOCKLEN == 0);
+
   AES_ctx ctx;
   AES_init_ctx(&ctx, (const uint8_t *)key.c_str());
 
@@ -33,6 +36,34 @@ std::string aes_ecb_decrypt(const std::string &ciphertext,
   for (size_t i = 0; i < copy.size(); i += AES_BLOCKLEN) {
     AES_ECB_decrypt(&ctx, (uint8_t *)copy.data() + i);
   }
+  return copy;
+}
+
+static void xor_inplace(uint8_t *target, const uint8_t *iv) {
+  for (size_t i = 0; i < AES_BLOCKLEN; i++) {
+    *(target + i) ^= *(iv + i);
+  }
+}
+
+std::string aes_cbc_decrypt(const std::string &ciphertext,
+                            const std::string &key) {
+  assert(ciphertext.size() % AES_BLOCKLEN == 0);
+
+  AES_ctx ctx;
+  AES_init_ctx(&ctx, (const uint8_t *)key.c_str());
+
+  uint8_t iv[AES_BLOCKLEN], iv_copy[AES_BLOCKLEN];
+  std::memset(iv, 0, AES_BLOCKLEN);
+
+  std::string copy = ciphertext;
+  for (size_t i = 0; i < copy.size(); i += AES_BLOCKLEN) {
+    uint8_t *ptr = (uint8_t *)copy.data() + i;
+    std::memmove(iv_copy, ptr, AES_BLOCKLEN);
+    AES_ECB_decrypt(&ctx, ptr);
+    xor_inplace(ptr, iv);
+    std::memmove(iv, iv_copy, AES_BLOCKLEN);
+  }
+
   return copy;
 }
 }  // namespace cryptopals

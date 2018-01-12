@@ -162,5 +162,11 @@ void add_all_solutions(ProblemManager *manager) {
     yellow.unpad_pkcs7(16);
     return yellow.encode() == "YELLOW SUBMARINE";
   });
+
+  manager->AddSolution(2, 10, []() {
+    Buffer buf("data/10.txt", BASE64_FILE);
+    std::string plaintext = aes_cbc_decrypt(buf.encode(), "YELLOW SUBMARINE");
+    return plaintext.find("Play that funky music") != std::string::npos;
+  });
 }
 }  // namespace cryptopals
