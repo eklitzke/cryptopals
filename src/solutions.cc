@@ -165,7 +165,7 @@ void add_all_solutions(ProblemManager *manager) {
 
   manager->AddSolution(2, 10, []() {
     Buffer buf("data/10.txt", BASE64_FILE);
-    buf.aes_cbc_decrypt("YELLOW SUBMARINE", false);
+    buf.aes_cbc_decrypt("YELLOW SUBMARINE");
     return buf.encode().find("Play that funky music") != std::string::npos;
   });
 }

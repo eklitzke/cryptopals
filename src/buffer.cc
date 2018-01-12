@@ -337,8 +337,6 @@ static void xor_inplace(uint8_t *target, const uint8_t *iv) {
 }
 
 void Buffer::aes_cbc_decrypt(const std::string &key, bool pkcs7) {
-  if (pkcs7) unpad_pkcs7();
-
   assert(buf_.size() % AES_BLOCKLEN == 0);
 
   AES_ctx ctx;
@@ -354,5 +352,7 @@ void Buffer::aes_cbc_decrypt(const std::string &key, bool pkcs7) {
     xor_inplace(ptr, iv);
     std::memmove(iv, iv_copy, AES_BLOCKLEN);
   }
+
+  if (pkcs7) unpad_pkcs7();
 }
 }  // namespace cryptopals
