@@ -24,4 +24,5 @@ std::string aes_ecb_decrypt(const std::string &ciphertext,
 
 std::string aes_cbc_decrypt(const std::string &ciphertext,
                             const std::string &key);
+
 }  // namespace cryptopals

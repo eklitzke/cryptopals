@@ -74,7 +74,10 @@ class Buffer {
   void pad_pkcs7(uint8_t octets);
 
   // undo padding bytes, as defined by pkcs #7
-  void unpad_pkcs7(uint8_t octets);
+  void unpad_pkcs7();
+
+  // cbc decrypt *in place*
+  void aes_cbc_decrypt(const std::string &key, bool pkcs7 = true);
 
  private:
   std::vector<uint8_t> buf_;

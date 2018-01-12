@@ -26,6 +26,7 @@
 #include <sstream>
 #include <unordered_map>
 
+#include "./aes.hpp"
 #include "./words.h"
 
 namespace cryptopals {
@@ -319,13 +320,39 @@ void Buffer::pad_pkcs7(uint8_t octets) {
   }
 }
 
-void Buffer::unpad_pkcs7(uint8_t octets) {
+void Buffer::unpad_pkcs7() {
   assert(!buf_.empty());
   uint8_t padval = *buf_.rbegin();
   assert(padval && buf_.size() >= padval);
   for (uint8_t i = 0; i < padval; i++) {
     assert(*buf_.rbegin() == padval);
     buf_.pop_back();
+  }
+}
+
+static void xor_inplace(uint8_t *target, const uint8_t *iv) {
+  for (size_t i = 0; i < AES_BLOCKLEN; i++) {
+    *(target + i) ^= *(iv + i);
+  }
+}
+
+void Buffer::aes_cbc_decrypt(const std::string &key, bool pkcs7) {
+  if (pkcs7) unpad_pkcs7();
+
+  assert(buf_.size() % AES_BLOCKLEN == 0);
+
+  AES_ctx ctx;
+  AES_init_ctx(&ctx, (const uint8_t *)key.c_str());
+
+  uint8_t iv[AES_BLOCKLEN], iv_copy[AES_BLOCKLEN];
+  std::memset(iv, 0, AES_BLOCKLEN);
+
+  for (size_t i = 0; i < buf_.size(); i += AES_BLOCKLEN) {
+    uint8_t *ptr = buf_.data() + i;
+    std::memmove(iv_copy, ptr, AES_BLOCKLEN);
+    AES_ECB_decrypt(&ctx, ptr);
+    xor_inplace(ptr, iv);
+    std::memmove(iv, iv_copy, AES_BLOCKLEN);
   }
 }
 }  // namespace cryptopals
