@@ -188,12 +188,49 @@ void add_all_solutions(ProblemManager *manager) {
     // run the test 10 times
     for (size_t i = 0; i < 10; i++) {
       std::vector<uint8_t> vec;
-      std::fill_n(std::back_inserter(vec), 1000, 0);
+      std::fill_n(std::back_inserter(vec), 10000, 0);
       Buffer buf(vec);
       std::string mode = oracle(buf);
       CHECK(mode == buf.guess_encryption_mode())
     }
     return true;
+  });
+
+  manager->AddSolution(2, 12, []() {
+    const Buffer suffix("data/12.txt", BASE64_FILE);
+    const std::string key = rand_key();
+    auto oracle = [&suffix, &key](Buffer &buf) {
+      buf.append(suffix);
+      buf.aes_ecb_encrypt(key);
+    };
+
+    // step 1: determine key size
+    size_t key_size = 0;
+    std::string initial_bytes = "";
+    for (size_t i = 4; i < 1000; i++) {
+      std::vector<uint8_t> vec;
+      std::fill_n(std::back_inserter(vec), i, 0);
+      Buffer buf(vec);
+      oracle(buf);
+      std::string start = buf.encode().substr(0, 4);
+      if (start == initial_bytes) {
+        key_size = i - 1;
+        break;
+      }
+      initial_bytes = start;
+    }
+    CHECK(key_size == 16)
+
+    // step 2: determine cipher mode
+    {
+      std::vector<uint8_t> vec;
+      std::fill_n(std::back_inserter(vec), 1000, 0);
+      Buffer buf(vec);
+      oracle(buf);
+      CHECK(buf.guess_encryption_mode() == "ECB")
+    }
+
+    return false;
   });
 }
 }  // namespace cryptopals

@@ -26,9 +26,9 @@
 #include <random>
 #include <sstream>
 #include <unordered_map>
-#include <unordered_set>
 
 #include "./aes.hpp"
+#include "./counter.h"
 #include "./util.h"
 #include "./words.h"
 
@@ -409,12 +409,26 @@ void Buffer::obfuscate(size_t min_bytes, size_t max_bytes) {
   buf_ = buf;
 }
 
-std::string Buffer::guess_encryption_mode() const {
-  std::unordered_set<uint8_t> seen;
-  for (auto x : buf_) {
-    seen.insert(x);
+std::string Buffer::guess_encryption_mode(size_t min_key_size,
+                                          size_t max_key_size) const {
+  // N.B. prefer larger key sizes
+  size_t best_key_size = 0, best_count = 0;
+  for (size_t sz = min_key_size; sz <= max_key_size; sz += 4) {
+    if (size() % sz) continue;
+    Counter<std::string> counter;
+    std::string data = encode();
+    assert(data.size() == buf_.size());
+    for (size_t i = 0; i < buf_.size(); i += sz) {
+      counter.add(data.substr(i, sz));
+    }
+
+    auto pr = counter.max_count();
+    if (pr.second >= best_count) {
+      best_count = pr.second;
+      best_key_size = sz;
+    }
   }
-  if (seen.size() < 100) {
+  if (best_count * best_key_size * 2 >= size()) {
     return "ECB";
   }
   return "CBC";

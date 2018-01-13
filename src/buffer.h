@@ -44,6 +44,10 @@ class Buffer {
     return buf_ == other.buf_;
   }
 
+  inline void append(const Buffer &other) {
+    buf_.insert(buf_.end(), other.buf_.begin(), other.buf_.end());
+  }
+
   Buffer slice(size_t start, size_t end) const;
 
   inline std::string encode() const {
@@ -96,7 +100,11 @@ class Buffer {
   void obfuscate(size_t min_bytes, size_t max_bytes);
 
   // return ECB or CBC based on our guess
-  std::string guess_encryption_mode() const;
+  std::string guess_encryption_mode(size_t min_key_size = 8,
+                                    size_t max_key_size = 32) const;
+  std::string guess_encryption_mode(size_t key_size) const {
+    return guess_encryption_mode(key_size, key_size);
+  }
 
  private:
   std::vector<uint8_t> buf_;
