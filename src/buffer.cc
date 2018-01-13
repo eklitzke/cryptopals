@@ -389,8 +389,8 @@ void Buffer::aes_cbc_encrypt(const std::string &key, bool pkcs7) {
   std::memset(iv, 0, AES_BLOCKLEN);
 
   for (size_t i = 0; i < buf_.size(); i += AES_BLOCKLEN) {
-    AES_ECB_encrypt(&ctx, buf_.data() + i);
     xor_inplace(buf_.data() + i, i == 0 ? iv : buf_.data() + i - AES_BLOCKLEN);
+    AES_ECB_encrypt(&ctx, buf_.data() + i);
   }
 }
 }  // namespace cryptopals

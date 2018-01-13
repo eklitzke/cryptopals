@@ -167,11 +167,6 @@ void add_all_solutions(ProblemManager *manager) {
     buf.aes_cbc_decrypt("YELLOW SUBMARINE");
     CHECK(buf.encode().find("Play that funky music") != std::string::npos)
     buf.aes_cbc_encrypt("YELLOW SUBMARINE");
-    std::cout << "XXXXXXXX" << std::endl;
-    std::cout << buf.size() << std::endl;
-    std::cout << copy.size() << std::endl;
-    std::cout << buf.encode_hex() << std::endl;
-    std::cout << copy.encode_hex() << std::endl;
     return buf == copy;
   });
 }
