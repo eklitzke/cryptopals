@@ -48,6 +48,8 @@ class Buffer {
     buf_.insert(buf_.end(), other.buf_.begin(), other.buf_.end());
   }
 
+  inline void append(uint8_t byte) { buf_.push_back(byte); }
+
   Buffer slice(size_t start, size_t end) const;
 
   inline std::string encode() const {

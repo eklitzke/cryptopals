@@ -230,6 +230,27 @@ void add_all_solutions(ProblemManager *manager) {
       CHECK(buf.guess_encryption_mode() == "ECB")
     }
 
+    // step 3: make short block
+    std::vector<uint8_t> vec;
+    std::fill_n(std::back_inserter(vec), key_size - 1, 0);
+    Buffer buf(vec);
+
+    // step 4: guess bytes
+    std::unordered_map<std::string, uint8_t> outputs;
+    for (int i = 0; i < 256; i++) {
+      uint8_t byte = static_cast<uint8_t>(i);
+      Buffer copy = buf;
+      copy.append(byte);
+      CHECK(copy.size() == key_size)
+      oracle(copy);
+      outputs.emplace(copy.encode().substr(0, key_size), byte);
+    }
+
+    oracle(buf);
+    auto it = outputs.find(buf.encode().substr(0, key_size));
+    CHECK(it != outputs.end());
+    std::cout << "first byte is " << it->second << std::endl;
+
     return false;
   });
 }
