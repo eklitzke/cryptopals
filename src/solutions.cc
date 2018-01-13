@@ -24,6 +24,12 @@
 #include "./buffer.h"
 #include "./solutions.h"
 
+#define CHECK(cond)                                                           \
+  if (!(cond)) {                                                              \
+    std::cerr << "CHECK failed " __FILE__ ":" << __LINE__ << ": " #cond "\n"; \
+    return false;                                                             \
+  }
+
 namespace cryptopals {
 void add_all_solutions(ProblemManager *manager) {
   manager->AddSolution(1, 1, []() {
@@ -31,10 +37,8 @@ void add_all_solutions(ProblemManager *manager) {
         "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f"
         "6e6f7573206d757368726f6f6d",
         HEX);
-    if (a.encode_base64() !=
-        "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t") {
-      return false;
-    }
+    CHECK(a.encode_base64() ==
+          "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t")
 
     Buffer b("SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t",
              BASE64);
@@ -93,9 +97,7 @@ void add_all_solutions(ProblemManager *manager) {
   manager->AddSolution(1, 6, []() {
     Buffer a("this is a test");
     Buffer b("wokka wokka!!!");
-    if (a.edit_distance(b) != 37) {
-      return false;
-    }
+    CHECK(a.edit_distance(b) == 37)
     Buffer buf("data/6.txt", BASE64_FILE);
     std::string key = buf.guess_vigenere_key(2, 40);
     return key == "Terminator X: Bring the noise";
@@ -103,8 +105,12 @@ void add_all_solutions(ProblemManager *manager) {
 
   manager->AddSolution(1, 7, []() {
     Buffer buf("data/7.txt", BASE64_FILE);
+    auto copy = buf;
     buf.aes_ecb_decrypt("YELLOW SUBMARINE");
-    return buf.encode().find("Play that funky music") != std::string::npos;
+    CHECK(buf.encode().find("Play that funky music") != std::string::npos)
+    buf.aes_ecb_encrypt("YELLOW SUBMARINE", false);
+    CHECK(buf.size() == copy.size())
+    return copy == buf;
   });
 
   manager->AddSolution(1, 8, []() {
@@ -143,28 +149,30 @@ void add_all_solutions(ProblemManager *manager) {
   manager->AddSolution(2, 9, []() {
     Buffer yellow("YELLOW SUBMARINE");
     yellow.pad_pkcs7(20);
-    if (yellow.encode() != "YELLOW SUBMARINE\x04\x04\x04\x04") {
-      return false;
-    }
+    CHECK(yellow.encode() == "YELLOW SUBMARINE\x04\x04\x04\x04")
     yellow.unpad_pkcs7();
-    if (yellow.encode() != "YELLOW SUBMARINE") {
-      return false;
-    }
+    CHECK(yellow.encode() == "YELLOW SUBMARINE")
     yellow.pad_pkcs7(16);
-    if (yellow.encode() !=
-        "YELLOW "
-        "SUBMARINE\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10"
-        "\x10") {
-      return false;
-    }
+    CHECK(yellow.encode() ==
+          "YELLOW "
+          "SUBMARINE\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10\x10"
+          "\x10\x10")
     yellow.unpad_pkcs7();
     return yellow.encode() == "YELLOW SUBMARINE";
   });
 
   manager->AddSolution(2, 10, []() {
     Buffer buf("data/10.txt", BASE64_FILE);
+    auto copy = buf;
     buf.aes_cbc_decrypt("YELLOW SUBMARINE");
-    return buf.encode().find("Play that funky music") != std::string::npos;
+    CHECK(buf.encode().find("Play that funky music") != std::string::npos)
+    buf.aes_cbc_encrypt("YELLOW SUBMARINE");
+    std::cout << "XXXXXXXX" << std::endl;
+    std::cout << buf.size() << std::endl;
+    std::cout << copy.size() << std::endl;
+    std::cout << buf.encode_hex() << std::endl;
+    std::cout << copy.encode_hex() << std::endl;
+    return buf == copy;
   });
 }
 }  // namespace cryptopals

@@ -37,8 +37,6 @@ Buffer Buffer::slice(size_t start, size_t end) const {
       std::vector<uint8_t>(buf_.cbegin() + start, buf_.cbegin() + end));
 }
 
-Buffer Buffer::copy() const { return Buffer(*this); }
-
 static const std::string b64_lut =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -195,9 +193,9 @@ void Buffer::xor_string(const std::string &key) {
 };
 
 float Buffer::try_single_byte_xor_key(uint8_t key) const {
-  Buffer clone = copy();
-  clone.xor_byte(key);
-  return clone.string_score();
+  Buffer copy = *this;
+  copy.xor_byte(key);
+  return copy.string_score();
 }
 
 uint8_t Buffer::guess_single_byte_xor_key(std::string *out,
@@ -206,13 +204,13 @@ uint8_t Buffer::guess_single_byte_xor_key(std::string *out,
   float best_score = std::numeric_limits<float>::max();
   for (int key = 0; key <= 255; key++) {
     uint8_t k = static_cast<uint8_t>(key);
-    auto clone = copy();
-    clone.xor_byte(k);
-    float val = clone.string_score();
+    auto copy = *this;
+    copy.xor_byte(k);
+    float val = copy.string_score();
     if (val < best_score) {
       best_score = val;
       best_key = k;
-      if (out != nullptr) *out = clone.encode();
+      if (out != nullptr) *out = copy.encode();
       if (score != nullptr) *score = val;
     }
   }
@@ -267,9 +265,9 @@ std::string Buffer::guess_vigenere_key(size_t min_key_size, size_t max_key_size,
     if (score < best_score) {
       best_score = score;
       best_key = key;
-      Buffer clone = copy();
-      clone.xor_string(key);
-      best_string = clone.encode();
+      auto copy = *this;
+      copy.xor_string(key);
+      best_string = copy.encode();
     }
   }
 
@@ -285,9 +283,9 @@ std::string Buffer::guess_vigenere_key(size_t key_length, float *score) const {
   const std::string key = os.str();
   assert(key.size() == key_length);
   if (score != nullptr) {
-    auto clone = copy();
-    clone.xor_string(key);
-    *score = clone.string_score();
+    auto copy = *this;
+    copy.xor_string(key);
+    *score = copy.string_score();
   }
   return key;
 }
@@ -312,9 +310,9 @@ std::vector<Buffer> Buffer::stack_and_transpose(size_t width) const {
   return transpose;
 }
 
-void Buffer::pad_pkcs7(uint8_t octets) {
-  assert(octets >= 1);
-  uint8_t padval = octets - (buf_.size() % octets);
+void Buffer::pad_pkcs7(uint8_t target_multiple) {
+  uint8_t padval = target_multiple - (buf_.size() % target_multiple);
+  assert(padval > 0);
   for (uint8_t i = 0; i < padval; i++) {
     buf_.push_back(padval);
   }
@@ -365,5 +363,34 @@ void Buffer::aes_cbc_decrypt(const std::string &key, bool pkcs7) {
   }
 
   if (pkcs7) unpad_pkcs7();
+}
+
+void Buffer::aes_ecb_encrypt(const std::string &key, bool pkcs7) {
+  if (pkcs7) pad_pkcs7(AES_BLOCKLEN);
+  assert(buf_.size() % AES_BLOCKLEN == 0);
+
+  AES_ctx ctx;
+  AES_init_ctx(&ctx, (const uint8_t *)key.c_str());
+
+  for (size_t i = 0; i < buf_.size(); i += AES_BLOCKLEN) {
+    AES_ECB_encrypt(&ctx, buf_.data() + i);
+  }
+}
+
+void Buffer::aes_cbc_encrypt(const std::string &key, bool pkcs7) {
+  if (pkcs7) pad_pkcs7(AES_BLOCKLEN);
+  assert(buf_.size() % AES_BLOCKLEN == 0);
+
+  AES_ctx ctx;
+  AES_init_ctx(&ctx, (const uint8_t *)key.c_str());
+
+  // TODO: make the iv configurable
+  uint8_t iv[AES_BLOCKLEN];
+  std::memset(iv, 0, AES_BLOCKLEN);
+
+  for (size_t i = 0; i < buf_.size(); i += AES_BLOCKLEN) {
+    AES_ECB_encrypt(&ctx, buf_.data() + i);
+    xor_inplace(buf_.data() + i, i == 0 ? iv : buf_.data() + i - AES_BLOCKLEN);
+  }
 }
 }  // namespace cryptopals

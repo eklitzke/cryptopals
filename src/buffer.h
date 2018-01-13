@@ -40,8 +40,11 @@ class Buffer {
 
   inline size_t size() const { return buf_.size(); }
 
+  inline bool operator==(const Buffer &other) const {
+    return buf_ == other.buf_;
+  }
+
   Buffer slice(size_t start, size_t end) const;
-  Buffer copy() const;
 
   inline std::string encode() const {
     return {reinterpret_cast<const char *>(buf_.data()), buf_.size()};
@@ -71,7 +74,7 @@ class Buffer {
                                  size_t guesses = 5) const;
 
   // add padding bytes, as defined by pkcs #7
-  void pad_pkcs7(uint8_t octets);
+  void pad_pkcs7(uint8_t target_multiple);
 
   // undo padding bytes, as defined by pkcs #7
   void unpad_pkcs7();
@@ -81,6 +84,12 @@ class Buffer {
 
   // cbc decrypt *in place*
   void aes_cbc_decrypt(const std::string &key, bool pkcs7 = true);
+
+  // ecb encrypt *in place*
+  void aes_ecb_encrypt(const std::string &key, bool pkcs7 = true);
+
+  // cbc encrypt *in place*
+  void aes_cbc_encrypt(const std::string &key, bool pkcs7 = true);
 
  private:
   std::vector<uint8_t> buf_;
