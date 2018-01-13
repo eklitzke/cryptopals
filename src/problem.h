@@ -29,10 +29,10 @@ class ProblemManager {
   ProblemManager();
 
   // Test everything, and return the number of failures.
-  int TestAll();
+  int TestAll(bool stop_on_error);
 
   // Test a given problem set.
-  int TestSet(int set);
+  int TestSet(int set, bool stop_on_error);
 
   // Test a given problem.
   int TestProblem(int set, int problem);

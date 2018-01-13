@@ -26,8 +26,10 @@
 inline int retval(int val) { return val == 0 ? 0 : 1; }
 
 int main(int argc, char **argv) {
-  static const char short_opts[] = "h";
+  bool stop_on_error = false;
+  static const char short_opts[] = "hx";
   static struct option long_opts[] = {{"help", no_argument, 0, 'h'},
+                                      {"stop-on-error", no_argument, 0, 'x'},
                                       {0, 0, 0, 0}};
   for (;;) {
     int c = getopt_long(argc, argv, short_opts, long_opts, nullptr);
@@ -36,8 +38,12 @@ int main(int argc, char **argv) {
     }
     switch (c) {
       case 'h':
-        std::cout << "usage: " << argv[0] << "\n";
+        std::cout << "usage: " << argv[0]
+                  << " [-h|--help] [-x|--stop-on-error]\n";
         return 0;
+        break;
+      case 'x':
+        stop_on_error = true;
         break;
       case '?':
         // getopt_long should already have printed an error message
@@ -50,11 +56,11 @@ int main(int argc, char **argv) {
   cryptopals::ProblemManager manager;
   if (argc - optind == 1) {
     unsigned long int set = std::strtoul(argv[optind], nullptr, 10);
-    return retval(manager.TestSet(set));
+    return retval(manager.TestSet(set, stop_on_error));
   } else if (argc - optind == 2) {
     unsigned long int set = std::strtoul(argv[optind++], nullptr, 10);
     unsigned long int problem = std::strtoul(argv[optind], nullptr, 10);
     return retval(manager.TestProblem(set, problem));
   }
-  return retval(manager.TestAll());
+  return retval(manager.TestAll(stop_on_error));
 }

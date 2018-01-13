@@ -45,21 +45,27 @@ void ProblemManager::AddSolution(int x, int y, func f) {
   solutions_.emplace(std::make_pair(pr, f));
 }
 
-int ProblemManager::TestAll() {
+int ProblemManager::TestAll(bool stop_on_error) {
   int fails = 0;
   for (auto &kv : solutions_) {
     fails += run_problem(kv.first.first, kv.first.second, kv.second);
+    if (stop_on_error && fails) {
+      break;
+    }
   }
   return fails;
 }
 
-int ProblemManager::TestSet(int set) {
+int ProblemManager::TestSet(int set, bool stop_on_error) {
   int fails = 0;
   bool found = false;
   for (auto &kv : solutions_) {
     if (kv.first.first == set) {
       found = true;
       fails += run_problem(kv.first.first, kv.first.second, kv.second);
+      if (stop_on_error && fails) {
+        break;
+      }
     }
   }
   if (!found) {
