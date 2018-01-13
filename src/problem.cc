@@ -16,21 +16,47 @@
 
 #include "./problem.h"
 
+#include <unistd.h>
 #include <cassert>
 #include <iostream>
+#include <sstream>
 
 #include "./buffer.h"
 #include "./solutions.h"
 
 namespace cryptopals {
 
+enum color_t { GREEN = 1, RED = 2 };
+
+std::string colorize(const std::string &s, color_t color) {
+  if (!isatty(STDOUT_FILENO)) {
+    return s;
+  }
+  bool did_color = true;
+  std::ostringstream os;
+  switch (color) {
+    case GREEN:
+      os << "\e[0;32m";
+      break;
+    case RED:
+      os << "\e[0;31m";
+      break;
+    default:
+      did_color = false;
+      break;
+  }
+  if (!did_color) return s;
+  os << s << "\e[0m";
+  return os.str();
+}
+
 inline int run_problem(int x, int y, func f) {
   std::cout << x << "." << y << " " << std::flush;
   if (f()) {
-    std::cout << "OK" << std::endl;
+    std::cout << colorize("OK", GREEN) << std::endl;
     return 0;
   }
-  std::cout << "FAIL" << std::endl;
+  std::cout << colorize("FAIL", RED) << std::endl;
   return 1;
 }
 
