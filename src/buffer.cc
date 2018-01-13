@@ -23,10 +23,13 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <random>
 #include <sstream>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "./aes.hpp"
+#include "./util.h"
 #include "./words.h"
 
 namespace cryptopals {
@@ -392,5 +395,28 @@ void Buffer::aes_cbc_encrypt(const std::string &key, bool pkcs7) {
     xor_inplace(buf_.data() + i, i == 0 ? iv : buf_.data() + i - AES_BLOCKLEN);
     AES_ECB_encrypt(&ctx, buf_.data() + i);
   }
+}
+
+void Buffer::obfuscate(size_t min_bytes, size_t max_bytes) {
+  std::string front = rand_string(min_bytes, max_bytes);
+  std::string back = rand_string(min_bytes, max_bytes);
+
+  std::vector<uint8_t> buf(front.size() + buf_.size() + back.size());
+  std::memmove(buf.data(), front.data(), front.size());
+  std::memmove(buf.data() + front.size(), buf_.data(), buf_.size());
+  std::memmove(buf.data() + front.size() + buf_.size(), back.data(),
+               back.size());
+  buf_ = buf;
+}
+
+std::string Buffer::guess_encryption_mode() const {
+  std::unordered_set<uint8_t> seen;
+  for (auto x : buf_) {
+    seen.insert(x);
+  }
+  if (seen.size() < 100) {
+    return "ECB";
+  }
+  return "CBC";
 }
 }  // namespace cryptopals

@@ -18,11 +18,13 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <random>
 #include <sstream>
 #include <unordered_map>
 
 #include "./buffer.h"
 #include "./solutions.h"
+#include "./util.h"
 
 #define CHECK(cond)                                                           \
   if (!(cond)) {                                                              \
@@ -168,6 +170,30 @@ void add_all_solutions(ProblemManager *manager) {
     CHECK(buf.encode().find("Play that funky music") != std::string::npos)
     buf.aes_cbc_encrypt("YELLOW SUBMARINE");
     return buf == copy;
+  });
+
+  manager->AddSolution(2, 11, []() {
+    auto oracle = [](Buffer &buf) {
+      buf.obfuscate(5, 10);
+      const std::string key = rand_key();
+      const bool do_ecb = rand_bool();
+      if (do_ecb) {
+        buf.aes_ecb_encrypt(key);
+        return "ECB";
+      }
+      buf.aes_cbc_encrypt(key);
+      return "CBC";
+    };
+
+    // run the test 10 times
+    for (size_t i = 0; i < 10; i++) {
+      std::vector<uint8_t> vec;
+      std::fill_n(std::back_inserter(vec), 1000, 0);
+      Buffer buf(vec);
+      std::string mode = oracle(buf);
+      CHECK(mode == buf.guess_encryption_mode())
+    }
+    return true;
   });
 }
 }  // namespace cryptopals

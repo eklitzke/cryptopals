@@ -91,6 +91,13 @@ class Buffer {
   // cbc encrypt *in place*
   void aes_cbc_encrypt(const std::string &key, bool pkcs7 = true);
 
+  // add [min_bytes, max_bytes] random data at the head of the string, and same
+  // at the end
+  void obfuscate(size_t min_bytes, size_t max_bytes);
+
+  // return ECB or CBC based on our guess
+  std::string guess_encryption_mode() const;
+
  private:
   std::vector<uint8_t> buf_;
 
