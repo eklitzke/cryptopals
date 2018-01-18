@@ -230,28 +230,45 @@ void add_all_solutions(ProblemManager *manager) {
       CHECK(buf.guess_encryption_mode() == "ECB")
     }
 
-    // step 3: make short block
-    std::vector<uint8_t> vec;
-    std::fill_n(std::back_inserter(vec), key_size - 1, 0);
-    Buffer buf(vec);
-
     // step 4: guess bytes
-    std::unordered_map<std::string, uint8_t> outputs;
-    for (int i = 0; i < 256; i++) {
-      uint8_t byte = static_cast<uint8_t>(i);
-      Buffer copy = buf;
-      copy.append(byte);
-      CHECK(copy.size() == key_size)
-      oracle(copy);
-      outputs.emplace(copy.encode().substr(0, key_size), byte);
+    std::vector<uint8_t> bytes;
+    for (size_t i = 0; i < suffix.size(); i++) {
+      // step 3: make short block
+      std::vector<uint8_t> vec;
+      int fill_size = key_size - i - 1;
+      while (fill_size < 0) {
+        fill_size += key_size;
+      }
+      std::fill_n(std::back_inserter(vec), fill_size, 'x');
+      Buffer shortbuf(vec);
+
+      bool found = false;
+      Buffer encbuf = shortbuf;
+      oracle(encbuf);
+
+      size_t offset = (i / key_size) * key_size;
+      std::string chunk = encbuf.encode().substr(offset, key_size);
+      CHECK(chunk.size() == key_size)
+
+      vec.insert(vec.end(), bytes.begin(), bytes.end());
+      for (int j = 0; j < 256; j++) {
+        uint8_t byte = static_cast<uint8_t>(j);
+        Buffer copy(vec);
+        copy.append(byte);
+        CHECK(copy.size() % key_size == 0)
+        oracle(copy);
+        CHECK(copy.size() % key_size == 0)
+        CHECK(copy.encode().substr(offset, key_size).size() == key_size)
+        if (copy.encode().substr(offset, key_size) == chunk) {
+          found = true;
+          bytes.push_back(byte);
+          break;
+        }
+      }
+      CHECK(found)
     }
-
-    oracle(buf);
-    auto it = outputs.find(buf.encode().substr(0, key_size));
-    CHECK(it != outputs.end());
-    std::cout << "first byte is " << it->second << std::endl;
-
-    return false;
+    std::string s((const char *)bytes.data(), bytes.size());
+    return s.find("Did you stop?") != std::string::npos;
   });
 }
 }  // namespace cryptopals
