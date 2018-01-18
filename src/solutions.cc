@@ -257,8 +257,6 @@ void add_all_solutions(ProblemManager *manager) {
         copy.append(byte);
         CHECK(copy.size() % key_size == 0)
         oracle(copy);
-        CHECK(copy.size() % key_size == 0)
-        CHECK(copy.encode().substr(offset, key_size).size() == key_size)
         if (copy.encode().substr(offset, key_size) == chunk) {
           found = true;
           bytes.push_back(byte);
